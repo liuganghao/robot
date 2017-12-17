@@ -1,7 +1,7 @@
 'use strict'
 // 导入基本模块
 require('babel-register')
-const Wechat = require('./lib/wechat')
+const Wechat = require('./../../lib/wechat')
 const qrcode = require('qrcode-terminal')
 const fs = require('fs')
 const request = require('request')
@@ -90,8 +90,8 @@ bot.on('message', msg => {
             console.log('[*] 有新的消息，注意查收')
             console.log('==============================')
             /**
-            * 获取消息发送者的显示名
-            */
+             * 获取消息发送者的显示名
+             */
             if (bot.contacts[msg.FromUserName].isSelf) {
                 //本人
                 console.log('回复消息给：' + bot.contacts[msg.ToUserName].NickName)
@@ -219,8 +219,7 @@ bot.on('error', err => {
 function replySimpleMsg(msg, toUserName) {
     //const config = require('./data.json')
     let config = {
-        "manageGroups": [
-            {
+        "manageGroups": [{
                 "Name": "moonlight",
                 "keyword": "应垂丝汀"
             },
@@ -244,7 +243,9 @@ function replySimpleMsg(msg, toUserName) {
                 flag = true
                 //找到群聊，拉人进群聊
                 let memberList = new Array()
-                var u = { 'UserName': toUserName }
+                var u = {
+                    'UserName': toUserName
+                }
                 memberList.push(u)
                 bot.updateChatroom(bot.contacts[x].UserName, memberList, 'addmember').then(result => {
                     var message = "@" + fromUser.NickName + " 欢迎加入我们的大家庭！"
