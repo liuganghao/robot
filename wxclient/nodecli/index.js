@@ -12,17 +12,17 @@ const debug = _debug('nodecli')
 /*微信实现类*/
 class nodecli {
     constructor(setting) {
-
         this.core = new wxCore(setting.wx);
-        this.db = new LocalDB();
-
-        this.state = 'init'
-        this.lastSyncTime = 0
-        this.syncThreadingId = 0
-        this.syncErrorCount = 0
-        this.checkThreadingId = 0
-        this.retryThreadingId = 0
-        this.tulingKey = ""
+        this.rt = {
+            createdon: new Date().toLocaleString(),
+            setting: setting
+        };
+        this.rt.state = 'onstart'
+        this.rt.lastSyncTime = 0
+        this.rt.syncThreadingId = 0
+        this.rt.syncErrorCount = 0
+        this.rt.checkThreadingId = 0
+        this.rt.retryThreadingId = 0
     }
 
     //启动
