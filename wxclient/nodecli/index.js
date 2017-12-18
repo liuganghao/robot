@@ -2,15 +2,11 @@
 import wxCore from './wxcore'
 import EventEmitter from 'events'
 import _ from 'lodash'
-
+import getCONF from './conf'
 import {
-    getCONF,
     isStandardBrowserEnv,
     assert,
 } from './utils'
-
-import ContactFactory from './interface/contact'
-import MessageFactory from './interface/message'
 
 import _debug from 'debug'
 const debug = _debug('nodecli')
