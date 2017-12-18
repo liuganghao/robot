@@ -1,5 +1,5 @@
 const NodeCli = require('./wxclient/nodecli')
 //foreach todo 
-const config = require('./wxclient/nodecli/demo_turing.json')
-let client = new NodeCli(config);
+const setting = require('./wxclient/nodecli/demo_turing.json')
+let client = new NodeCli(setting);
 client.start();
