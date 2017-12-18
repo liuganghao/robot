@@ -1,22 +1,23 @@
-import axios from 'axios'
+var axios = require('axios')
 
 const getPgv = c => {
   return (c || '') + Math.round(2147483647 * (Math.random() || 0.5)) * (+new Date() % 1E10)
 }
-'use strict'
-import Assert from 'assert'
-import _debug from 'debug'
+var Assert = require('assert')
+var _debug = require('debug')
 const debug = _debug('util')
 
-export const isStandardBrowserEnv = (
-  typeof window !== 'undefined' &&
-  typeof document !== 'undefined' &&
-  typeof document.createElement === 'function'
-)
+function isStandardBrowserEnv(){
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined' &&
+    typeof document.createElement === 'function'
+  );
+}
 
-export const isFunction = val => Object.prototype.toString.call(val) === '[object Function]'
+module.exports.isFunction = val => Object.prototype.toString.call(val) === '[object Function]'
 
-export function convertEmoji(s) {
+module.exports.convertEmoji = function convertEmoji(s) {
   return s ? s.replace(/<span.*?class="emoji emoji(.*?)"><\/span>/g, (a, b) => {
     switch (b.toLowerCase()) {
       case '1f639':
@@ -45,14 +46,14 @@ export function convertEmoji(s) {
   }) : ''
 }
 
-export function formatNum(num, length) {
+module.exports.formatNum = function formatNum(num, length) {
   num = (isNaN(num) ? 0 : num).toString()
   let n = length - num.length
 
   return n > 0 ? [new Array(n + 1).join('0'), num].join('') : num
 }
 
-export const assert = {
+module.exports.assert = {
   equal(actual, expected, response) {
     try {
       Assert.equal(actual, expected)
@@ -85,18 +86,18 @@ export const assert = {
   }
 }
 
-export function getClientMsgId() {
+module.exports.getClientMsgId = function getClientMsgId() {
   return (Date.now() + Math.random().toFixed(3)).replace('.', '')
 }
 
-export function getDeviceID() {
+module.exports.getDeviceID = function getDeviceID() {
   return 'e' + ('' + Math.random().toFixed(15)).substring(2, 17)
 }
 
-export function Request(defaults) {
+module.exports.Request = function Request(defaults) {
   defaults = defaults || {}
   defaults.headers = defaults.headers || {}
-  if (!isStandardBrowserEnv) {
+  if (!isStandardBrowserEnv()) {
     defaults.headers['user-agent'] = defaults.headers['user-agent'] || 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36'
     defaults.headers['connection'] = defaults.headers['connection'] || 'close'
   }
@@ -106,7 +107,7 @@ export function Request(defaults) {
   defaults.httpsAgent = false
 
   this.axios = axios.create(defaults)
-  if (!isStandardBrowserEnv) {
+  if (!isStandardBrowserEnv()) {
     this.Cookie = defaults.Cookie || {}
     this.Cookie['pgv_pvi'] = getPgv()
     this.Cookie['pgv_si'] = getPgv('s')
