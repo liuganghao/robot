@@ -27,8 +27,9 @@ class nodecli {
 
     //启动
     start() {
-        debug('微信启动...')
-        //return this._login().then(() => this._init())
+        debug('微信启动...');
+
+        return this._login().then(() => this._init())
     }
 
     // //重启
