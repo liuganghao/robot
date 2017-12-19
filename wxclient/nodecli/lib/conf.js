@@ -152,12 +152,12 @@ const CONF = {
   SYNCCHECK_SELECTOR_NORMAL: 0,
   SYNCCHECK_SELECTOR_MSG: 2,
   SYNCCHECK_SELECTOR_MOBILEOPEN: 7,
-  STATE: {
-    init: 'init',
-    uuid: 'uuid',
-    login: 'login',
-    logout: 'logout'
-  },
+  // STATE: {
+  //   init: 'init',
+  //   uuid: 'uuid',
+  //   login: 'login',
+  //   logout: 'logout'
+  // },
   SPECIALUSERS: ['newsapp', 'fmessage', 'filehelper', 'weibo', 'qqmail', 'fmessage', 'tmessage',
     'qmessage', 'qqsync', 'floatbottle', 'lbsapp', 'shakeapp', 'medianote', 'qqfriend',
     'readerapp', 'blogapp', 'facebookapp', 'masssendapp', 'meishiapp', 'feedsapp', 'voip',
@@ -167,7 +167,7 @@ const CONF = {
   ]
 }
 
-export function getCONF(host) {
+function getCONF(host) {
   host = host || 'wx.qq.com'
   let origin = `https://${host}`
   let loginUrl = 'login.weixin.qq.com'
@@ -224,3 +224,4 @@ export function getCONF(host) {
   conf.API_tulingBot = 'http://www.tuling123.com/openapi/api'
   return Object.assign(conf, CONF)
 }
+exports = module.exports = getCONF;

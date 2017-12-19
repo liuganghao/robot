@@ -1,22 +1,16 @@
 ﻿// 导入基本模块
-import path from 'path'
-import _debug from 'debug'
-import FormData from 'form-data'
-import mime from 'mime'
-import bl from 'bl'
-import {
-  getCONF,
-  Request,
-  isStandardBrowserEnv,
-  assert,
-  getClientMsgId,
-  getDeviceID
-} from './utils'
+var path = require('path')
+var _debug = require('debug')
+var FormData = require('form-data')
+var mime = require('mime')
+var bl = require('bl')
+var getCONF = require('./conf')
+var utils = require('./utils')
 
 const debug = _debug('wxCore')
 
 /*微信核心类*/
-export default class wxCore {
+class wxCore {
   constructor(data) {
     this.prop = {
       uuid: '',
@@ -33,7 +27,7 @@ export default class wxCore {
     this.conf = getCONF()
     this.cookie = {}
     this.user = {}
-    this.request = new Request({
+    this.request = new utils.Request({
       Cookie: this.cookie
     })
 
@@ -66,7 +60,7 @@ export default class wxCore {
       return this.request(options).then(result => {
         let window = { QRLogin: {} }
         eval(result.data)
-        assert.equal(window.QRLogin.code, 200, result)
+        utils.assert.equal(window.QRLogin.code, 200, result)
         this.prop.uuid = window.QRLogin.uuid
         return window.QRLogin.uuid
       })
@@ -91,7 +85,7 @@ export default class wxCore {
       return this.request(options).then(result => {
         let window = {}
         eval(result.data)
-        assert.notEqual(window.code, 400, result)
+        utils.assert.notEqual(window.code, 400, result)
         if (window.code === 200) {
           this.conf = getCONF(window.redirect_uri.match(/(?:\w+\.)+\w+/)[0])
           this.redirectUri = window.redirect_uri
@@ -133,7 +127,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(result => {
         let data = result.data
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
         this.prop.skey = data.SKey || this.prop.skey
         this.updateSyncKey(data)
         Object.assign(this.user, data.User)
@@ -147,7 +141,7 @@ export default class wxCore {
       pass_ticket: this.prop.pass_ticket,
       lang: 'zh_CN',
     }
-    let clientMsgId = getClientMsgId()
+    let clientMsgId = utils.getClientMsgId()
     let data = {
       'BaseRequest': this.getBaseRequest(),
       'Code': to ? 1 : 3,
@@ -164,7 +158,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(result => {
         let data = result.data
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
       })
     }).catch(err => {
       debug(err)
@@ -189,7 +183,7 @@ export default class wxCore {
       }
       return this.request(options).then(result => {
         let data = result.data
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
 
         return data
       })
@@ -221,7 +215,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(result => {
         let data = result.data;
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
         return data.ContactList
       })
     }).catch(err => {
@@ -272,7 +266,7 @@ export default class wxCore {
       'sid': this.prop.sid,
       'uin': this.prop.uin,
       'skey': this.prop.skey,
-      'deviceid': getDeviceID(),
+      'deviceid': utils.getDeviceID(),
       'synckey': this.prop.syncKeyStr,
     }
     let options = {
@@ -286,7 +280,7 @@ export default class wxCore {
           synccheck: {}
         }
         eval(result.data)
-        assert.equal(window.synccheck.retcode, this.conf.SYNCCHECK_RET_SUCCESS, result)
+        utils.assert.equal(window.synccheck.retcode, this.conf.SYNCCHECK_RET_SUCCESS, result)
         return window.synccheck.selector
       })
     }).catch(err => {
@@ -317,7 +311,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(result => {
         let data = result.data
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
         this.updateSyncKey(data)
         this.prop.skey = data.SKey || this.prop.skey
         return data
@@ -355,7 +349,7 @@ export default class wxCore {
       'pass_ticket': this.prop.pass_ticket,
       'lang': 'zh_CN',
     }
-    let clientMsgId = getClientMsgId()
+    let clientMsgId = utils.getClientMsgId()
     let data = {
       'BaseRequest': this.getBaseRequest(),
       'Scene': 0,
@@ -377,7 +371,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(result => {
         let data = result.data
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
         return data
       })
     }).catch(err => {
@@ -393,7 +387,7 @@ export default class wxCore {
       'pass_ticket': this.prop.pass_ticket,
       'lang': 'zh_CN',
     }
-    let clientMsgId = getClientMsgId()
+    let clientMsgId = utils.getClientMsgId()
     let data = {
       'BaseRequest': this.getBaseRequest(),
       'Scene': 0,
@@ -420,7 +414,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(result => {
         let data = result.data;
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
         return data
       })
     }).catch(err => {
@@ -484,7 +478,7 @@ export default class wxCore {
           default:
             mediatype = 'doc'
         }
-        let clientMsgId = getClientMsgId()
+        let clientMsgId = utils.getClientMsgId()
         let uploadMediaRequest = JSON.stringify({
           BaseRequest: this.getBaseRequest(),
           ClientMediaId: clientMsgId,
@@ -511,7 +505,7 @@ export default class wxCore {
           knownLength: size
         })
         return new Promise((resolve, reject) => {
-          if (isStandardBrowserEnv) {
+          if (utils.isStandardBrowserEnv) {
             return resolve({
               data: form,
               headers: {}
@@ -540,7 +534,7 @@ export default class wxCore {
         return this.request(options).then(result => {
           let data = result.data
           let mediaId = data.MediaId
-          assert.ok(mediaId, result)
+          utils.assert.ok(mediaId, result)
           return {
             name: name,
             size: size,
@@ -564,7 +558,7 @@ export default class wxCore {
       'f': 'json',
       'lang': 'zh_CN'
     }
-    let clientMsgId = getClientMsgId()
+    let clientMsgId = utils.getClientMsgId()
     let data = {
       'BaseRequest': this.getBaseRequest(),
       'Scene': 0,
@@ -586,7 +580,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(res => {
         let data = res.data
-        assert.equal(data.BaseResponse.Ret, 0, res)
+        utils.assert.equal(data.BaseResponse.Ret, 0, res)
         return data
       })
     }).catch(err => {
@@ -603,7 +597,7 @@ export default class wxCore {
       'f': 'json',
       'lang': 'zh_CN'
     }
-    let clientMsgId = getClientMsgId()
+    let clientMsgId = utils.getClientMsgId()
     let data = {
       'BaseRequest': this.getBaseRequest(),
       'Scene': 0,
@@ -625,7 +619,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(res => {
         let data = res.data
-        assert.equal(data.BaseResponse.Ret, 0, res)
+        utils.assert.equal(data.BaseResponse.Ret, 0, res)
         return data
       })
     }).catch(err => {
@@ -642,7 +636,7 @@ export default class wxCore {
       'f': 'json',
       'lang': 'zh_CN'
     }
-    let clientMsgId = getClientMsgId()
+    let clientMsgId = utils.getClientMsgId()
     let data = {
       'BaseRequest': this.getBaseRequest(),
       'Scene': 0,
@@ -664,7 +658,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(res => {
         let data = res.data
-        assert.equal(data.BaseResponse.Ret, 0, res)
+        utils.assert.equal(data.BaseResponse.Ret, 0, res)
         return data
       })
     }).catch(err => {
@@ -681,7 +675,7 @@ export default class wxCore {
       'f': 'json',
       'lang': 'zh_CN'
     }
-    let clientMsgId = getClientMsgId()
+    let clientMsgId = utils.getClientMsgId()
     let data = {
       'BaseRequest': this.getBaseRequest(),
       'Scene': 2,
@@ -743,7 +737,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(data).then(res => {
         let data = res.data
-        assert.equal(data.BaseResponse.Ret, 0, res)
+        utils.assert.equal(data.BaseResponse.Ret, 0, res)
         return data
       })
     }).catch(err => {
@@ -909,7 +903,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(result => {
         let data = result.data
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
         return data
       })
     }).catch(err => {
@@ -946,7 +940,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(result => {
         let data = result.data
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
         return data
       })
     }).catch(err => {
@@ -977,7 +971,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(result => {
         let data = result.data
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
         return data
       })
     }).catch(err => {
@@ -1011,7 +1005,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(result => {
         let data = result.data
-        assert.equal(data.BaseResponse.Ret, 0, result)
+        utils.assert.equal(data.BaseResponse.Ret, 0, result)
         return data
       })
     }).catch(err => {
@@ -1060,7 +1054,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(res => {
         let data = res.data
-        assert.equal(data.BaseResponse.Ret, 0, res)
+        utils.assert.equal(data.BaseResponse.Ret, 0, res)
         return data
       })
     }).catch(err => {
@@ -1090,7 +1084,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(res => {
         let data = res.data
-        assert.equal(data.BaseResponse.Ret, 0, res)
+        utils.assert.equal(data.BaseResponse.Ret, 0, res)
         return data
       })
     }).catch(err => {
@@ -1118,7 +1112,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(res => {
         let data = res.data
-        assert.equal(data.BaseResponse.Ret, 0, res)
+        utils.assert.equal(data.BaseResponse.Ret, 0, res)
       })
     }).catch(err => {
       debug(err)
@@ -1131,7 +1125,7 @@ export default class wxCore {
       BaseRequest: this.getBaseRequest(),
       SvrMsgId: msgId,
       ToUserName: toUserName,
-      ClientMsgId: getClientMsgId()
+      ClientMsgId: utils.getClientMsgId()
     }
     let options = {
       method: 'POST',
@@ -1141,7 +1135,7 @@ export default class wxCore {
     return Promise.resolve().then(() => {
       return this.request(options).then(res => {
         let data = res.data
-        assert.equal(data.BaseResponse.Ret, 0, res)
+        utils.assert.equal(data.BaseResponse.Ret, 0, res)
         return data
       })
     }).catch(err => {
@@ -1155,9 +1149,10 @@ export default class wxCore {
       Uin: parseInt(this.prop.uin),
       Sid: this.prop.sid,
       Skey: this.prop.skey,
-      DeviceID: getDeviceID()
+      DeviceID: utils.getDeviceID()
     }
   }
 
 }
 
+exports = module.exports=wxCore;
